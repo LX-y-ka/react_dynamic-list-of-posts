@@ -6,7 +6,7 @@ import { client } from '../utils/fetchClient';
 import { NewCommentForm } from './NewCommentForm';
 
 type Props = {
-  post: Post | null;
+  post: Post;
 };
 
 export const PostDetails: React.FC<Props> = ({ post }) => {
@@ -27,7 +27,7 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
     setLoading(true);
 
     client
-      .get<Comment[]>(`/comments?postId=${post?.id}`)
+      .get<Comment[]>(`/comments?postId=${post.id}`)
       .then(result => setComments(result))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
@@ -37,9 +37,9 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
     <div className="content" data-cy="PostDetails">
       <div className="content" data-cy="PostDetails">
         <div className="block">
-          <h2 data-cy="PostTitle">{`#${post?.id}: ${post?.title}`}</h2>
+          <h2 data-cy="PostTitle">{`#${post.id}: ${post.title}`}</h2>
 
-          <p data-cy="PostBody">{post?.body}</p>
+          <p data-cy="PostBody">{post.body}</p>
         </div>
 
         <div className="block">
@@ -51,12 +51,14 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
             </div>
           ) : (
             <>
-              {!loading && !error && comments.length === 0 && (
+              {!loading && comments.length === 0 && (
                 <p className="title is-4" data-cy="NoCommentsMessage">
                   No comments yet
                 </p>
               )}
-              <p className="title is-4">Comments:</p>
+              {comments.length > 0 && !loading && (
+                <p className="title is-4">Comments:</p>
+              )}
 
               {comments.map(c => (
                 <article

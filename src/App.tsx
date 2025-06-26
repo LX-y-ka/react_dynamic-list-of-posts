@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import './App.scss';
@@ -5,7 +6,7 @@ import './App.scss';
 import { PostsList } from './components/PostsList';
 import { UserSelector } from './components/UserSelector';
 import { Loader } from './components/Loader';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User } from './types/User';
 import { Post } from './types/Post';
 import { client } from './utils/fetchClient';
@@ -15,31 +16,24 @@ import { PostDetails } from './components/PostDetails';
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<'idle' | 'loading' | 'done'>('idle');
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const hasStartedLoading = useRef(false);
-  const isNoPostError =
-    selectedUser !== null &&
-    !loading &&
-    posts.length === 0 &&
-    !error &&
-    !hasStartedLoading.current;
 
   useEffect(() => {
     setSelectedPost(null);
+
     if (selectedUser !== null) {
       setPosts([]);
-      setLoading(true);
-      hasStartedLoading.current = true;
+      setLoading('loading');
+      setError(false);
 
       client
         .get<Post[]>(`/posts?userId=${selectedUser.id}`)
         .then(result => setPosts(result))
         .catch(() => setError(true))
         .finally(() => {
-          setLoading(false);
-          hasStartedLoading.current = false;
+          setLoading('done');
         });
     }
   }, [selectedUser]);
@@ -62,9 +56,9 @@ export const App = () => {
                   <p data-cy="NoSelectedUser">No user selected</p>
                 )}
 
-                {loading && <Loader />}
+                {loading === 'loading' && <Loader />}
 
-                {error && (
+                {loading === 'done' && error && (
                   <div
                     className="notification is-danger"
                     data-cy="PostsLoadingError"
@@ -73,19 +67,24 @@ export const App = () => {
                   </div>
                 )}
 
-                {isNoPostError ? (
-                  <div className="notification is-warning" data-cy="NoPostsYet">
-                    No posts yet
-                  </div>
-                ) : (
-                  posts.length > 0 &&
-                  !loading && (
-                    <PostsList
-                      onSelect={setSelectedPost}
-                      posts={posts}
-                      selectedPost={selectedPost}
-                    />
-                  )
+                {loading === 'done' &&
+                  !error &&
+                  selectedUser !== null &&
+                  posts.length === 0 && (
+                    <div
+                      className="notification is-warning"
+                      data-cy="NoPostsYet"
+                    >
+                      No posts yet
+                    </div>
+                  )}
+
+                {loading === 'done' && !error && posts.length > 0 && (
+                  <PostsList
+                    onSelect={setSelectedPost}
+                    posts={posts}
+                    selectedPost={selectedPost}
+                  />
                 )}
               </div>
             </div>

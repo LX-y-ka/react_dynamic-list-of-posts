@@ -13,7 +13,6 @@ export const UserSelector: React.FC<Props> = ({ onSelect, selectedUser }) => {
   const [users, setUsers] = useState<User[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-
   const handleSelect = (u: User) => {
     setIsOpenMenu(false);
     onSelect(u);

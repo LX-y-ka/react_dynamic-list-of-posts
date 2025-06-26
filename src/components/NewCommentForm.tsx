@@ -5,7 +5,7 @@ import { Post } from '../types/Post';
 import { Comment } from '../types/Comment';
 
 type Props = {
-  post: Post | null;
+  post: Post;
   setAddError: (err: boolean) => void;
   onAdd: (comment: Comment) => void;
 };
@@ -33,7 +33,7 @@ export const NewCommentForm: React.FC<Props> = ({
     setLoading(true);
 
     const newComment = {
-      postId: post?.id,
+      postId: post.id,
       name: name,
       email: email,
       body: text,
