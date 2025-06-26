@@ -24,6 +24,11 @@ export const NewCommentForm: React.FC<Props> = ({
   const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!post){
+
+      return;
+    }
+
     if (!name || !email || !text) {
       setError(true);
 
